@@ -13,6 +13,9 @@
         "matches": ["https://mmabetclub.com/*"],
         "js": ["content.js"]
       }
-    ]
+    ],
+    "background":{
+      "service_worker":"background.js"
+    }
   }
   

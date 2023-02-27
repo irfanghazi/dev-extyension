@@ -21,11 +21,11 @@ document.addEventListener("keydown", function (event) {
 
 
     // Do a lookup to get a list of suggestions for the last word
-    const suggestions = getSuggestions(lastWord);
+    getSuggestions(lastWord);
     // If we have suggestions, display them in a popup
-    if (suggestions.length > 0) {
-        displaySuggestions(suggestions);
-    }
+    // displaySuggestions(suggestions);
+    // if (suggestions.length > 0) {
+    // }
 
 
 })
@@ -33,12 +33,25 @@ document.addEventListener("keydown", function (event) {
 
 const getSuggestions = (word) => {
     // Use an API to get a list of suggestions for the given word
-   
-    // Return an array of strings representing the suggestions
-    return ["suggestion 1", "suggestion 2", "suggestion 3"];
+    let data = []
+    chrome.storage.local.get(['words'], (res) => {
+        let {words} = res
+        const data = words.filter((ele) => {
+            // console.log("eleeeeee", ele)
+           return ele.includes(word)
+        
+        })
+        // data.push(res)
+        displaySuggestions(data);
+
+    })
 }
 
 function displaySuggestions(suggestions) {
+    console.log("suggestions", suggestions)
+
+
+
     // Create a popup element to display the suggestions
     let popup = document.createElement("div");
     popup.id = "auto-suggest-popup";
@@ -49,6 +62,7 @@ function displaySuggestions(suggestions) {
         suggestionElement.className = "suggestion";
         suggestionElement.textContent = suggestion;
         popup.appendChild(suggestionElement);
+        // popup.innerText = suggestionElement
     }
     //Position the popup next to the current input element
     let inputElement = document.activeElement;
@@ -66,6 +80,29 @@ function displaySuggestions(suggestions) {
 
     //Add the popup to the document
     console.log("ppoppp", popup)
+    const suggestedWords = document.getElementById("auto-suggest-popup")
+    console.dir("auto-suggest-popup", suggestedWords)
+
+
     popup.style.display = 'block';
-    document.body.appendChild(popup);
+    const ele1 = document.getElementById("segest");
+    console.log(ele1)
+    if(!ele1){
+        let suggest = document.createElement("div");
+        suggest.setAttribute('id',"segest")
+        suggest.className = "displayclass";
+        document.body.appendChild(suggest)
+        console.dir(suggest,popup)
+        suggest.innerHTML = popup.innerHTML 
+
+    } else {
+        ele1.className = "displayclass";
+        ele1.innerHTML = popup.innerHTML
+        // ele1.style.backgroundColor = "red"
+
+    }
+
+
+
+    // document.body.popup=popup
 }
