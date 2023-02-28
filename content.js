@@ -1,4 +1,3 @@
-
 // document.addEventListener("keyup", function (event) {
 //     // console.log("******", event)
 //     // const bio = document.getElementById("bio")
@@ -123,9 +122,9 @@ inputElement.addEventListener("keyup",async function (e) {
     const {words} =  await chrome.storage.local.get(['words'])
     e.target.classList.add("rajeev")
     var newEle = inputElement.getElementsByClassName("rajeev")
+    removeElements()
+    newEle[0].parentNode.appendChild(ulList)
     
-   newEle[0].parentNode.appendChild(ulList)
-   
     for (const i of words) {
         if(i.toLowerCase().startsWith(e.target.value.toLowerCase())&&e.target.value != ""){
             let listItem = document.createElement("li")
@@ -136,8 +135,8 @@ inputElement.addEventListener("keyup",async function (e) {
             console.log(word)
             listItem.innerHTML = word
             listItem.onclick = fun1
-            document.querySelector(".list1").appendChild(listItem)
-            newEle[0].nextElementSibling.appendChild(listItem)
+            document.querySelector(".list1")?.appendChild(listItem)
+            newEle[0].nextElementSibling?.appendChild(listItem)
         }
     }
     console.log(newEle[0].parentNode)
@@ -151,12 +150,11 @@ function fun1 (value) {
     wordsarray[wordsarray.length-1] = data
     console.log(wordsarray,ele2[0].value)
     ele2[0].value = wordsarray.join(" ")
+    removeElements()
 }
 
 function removeElements() {
-    let items = document.querySelector(".list-items")
+    let items = inputElement.querySelector(".list-items")
     console.log(items,"itemsllllllll")
-    items?.forEach((item)=>{
-        item?.remove();
-    })
+        items?.parentElement?.remove()
 }
