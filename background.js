@@ -1,12 +1,13 @@
 chrome.runtime.onInstalled.addListener((details) => {
-    console.log("details", details)
-    fetch("https://jsonplaceholder.typicode.com/users")
+    let count =0;
+    for (i=0; i < 10; i++){
+        count += count
+    }
+    console.log("Count", count)
+    fetch("https://stage-api.medspellapp.com/getDictionaryItems")
         .then((res) => res.json())
-        .then((data) => { 
-            console.log("Data", data)
-            const name = data.map((ele) => ele.name)
-            console.log("Name", name) 
-            chrome.storage.local.set({words:name})
+        .then((data) => {          
+            chrome.storage.local.set({data})
         })
 })
 console.log("Background runs")
