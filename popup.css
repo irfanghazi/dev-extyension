@@ -1,0 +1,48 @@
+body{
+    width: 300px;
+    height: 300px;
+    background-color: #b6e9e9 !important;
+}
+.header{
+    margin: 20px;
+    font-size:20px;
+}
+.email-input{
+    font-size: 13px;
+}
+
+
+#signup {
+    font: 2em sans-serif;
+
+}
+#email{
+    /* background-color: blueviolet; */
+    width: 95% ;
+    border-radius: 60px ;
+    margin: auto ;
+    font-size: 13px;
+}
+
+#exampleInputPassword1 {
+    width: 95% ;
+    border-radius: 60px ;
+    margin: auto ;
+    font-size: 13px;    
+}
+.copyright{
+    font-size: 11px !important;
+    position: absolute;
+    bottom: 0px;
+    left: 12px;
+}
+
+#submit {
+    background-color: lightcoral;;
+    width: 35% ;
+    margin-top: 20px ;
+    justify-content: center;
+}
+.submitButton:hover{
+background-color: rgb(223, 94, 94) !important;
+}
