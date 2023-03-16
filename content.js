@@ -1,19 +1,17 @@
 
 let inputElement = document.activeElement;
-console.log("DDDDDDDD", inputElement)
 
 let str = ""
 let lastWord;
 let lastWordIndex
 
-inputElement.addEventListener("input", async function (e) {
-    // console.log(e.target.value)
+inputElement.addEventListener("input", async function (e) { 
     let searchString = e.target?.value?.trim()?.split(" ");
     if (!str?.length) {
+        console.log("hit3")
         // running first time when the user start type to get the first letter
         lastWord = searchString?.[searchString?.length - 1];
         lastWordIndex = searchString?.length
-        console.log("first", lastWord, lastWordIndex)
     } else {
         
         // running when the str get its first letter
@@ -28,13 +26,15 @@ inputElement.addEventListener("input", async function (e) {
                 break;
             }
         }
-        if (currentWord?.length) {
+        if (currentWord?.length>0) {
+            console.log("hit22",currentWord?.length)
             lastWord = currentWord
         } else {
             if (strarray?.filter(e => e.length != 0).length == searchString?.filter(e => e.length != 0).length) {
                 lastWord = ""
                 lastWordIndex = 0
             } else {
+                console.log("Hit11")
                 lastWord = searchString[searchString?.length - 1]
                 lastWordIndex = searchString?.length
             }
@@ -68,30 +68,40 @@ inputElement.addEventListener("input", async function (e) {
 
 
     // we want to add a li under ul for appending the word in the respective input feild
-    var  parentDiv = document.createElement("div")
-    parentDiv.classList.add("parent-div")
+    var newEle = inputElement.getElementsByClassName("auto-suggest") 
    let ulList = document.createElement("ul")
     ulList.classList.add("list1")
     ulList.id = "suggestion"
     ulList.style.listStyle = "none"
-    ulList.style.position='absolute'
+    ulList.style.position='fixed'
     ulList.style.backgroundColor='#fff'
+    ulList.style.zIndex='999999'
+    ulList.style.top=(e.target.offsetTop + e.target.offsetHeight)+"px"
+    ulList.style.left=e.target.offsetLeft+"px"
+    ulList.style.padding="0px 16px"
+    ulList.style.boxShadow="2px 1px 10px #0000001a"
+    // console.log(e.target.offsetTop , e.target.offsetHeight, e.target.offsetLeft , 'ddd')
+
   
     e.target.classList.add("auto-suggest")
-    var newEle = inputElement.getElementsByClassName("auto-suggest")
-    newEle[0].style.position="relative"
+  
 
-    // newEle[0]?.parentNode?.appendChild(ulList)
-    if(!(document.querySelector(".parent-div"))){
-        newEle[0]?.insertAdjacentElement("afterend", parentDiv)
-        parentDiv.appendChild(newEle[0])
-    
-    }
-    
-
+    newEle[0]?.insertAdjacentElement("afterend", ulList)
 
     removeElements()
+    // var  parentDiv = document.createElement("div")
+    // parentDiv.classList.add("parent-div")
+    // parentDiv.style.position="relative"
+    // if(!(inputElement.querySelector(".parent-div"))){
+    //     newEle[0]?.insertAdjacentElement("afterend", parentDiv)
+    //     parentDiv.appendChild(newEle[0].classList="")
+    //     parentDiv.appendChild(ulList)
+    //     parentDiv.querySelector(".auto-suggest").focus();
+    // } else {
+    //     inputElement.querySelector(".parent-div").appendChild(ulList)
+    // }
 
+  
     // creating li for each words to show suggesation
     for (const i of matched) {
         let listItem = document.createElement("li")
@@ -103,9 +113,10 @@ inputElement.addEventListener("input", async function (e) {
         listItem.onclick = displaySuggesation
         document.querySelector(".list1")?.appendChild(listItem)
         // newEle[0]?.nextElementSibling?.appendChild(listItem)
-        newEle[0]?.insertAdjacentHTML("beforeend", "&nbsp;")
+        // newEle[0]?.insertAdjacentHTML("beforeend", "&nbsp;")
     }
-    if (lastWord === "") {
+    console.log("lastword", lastWord)
+    if (lastWord == " " || lastWord == "")  {
         removeElements()
     }
 })
@@ -118,11 +129,15 @@ function displaySuggesation(value) {
     ele2[0].value = wordsarray.join(" ")
     ele2[0].textContent = wordsarray.join(" ")
     ele2[0].focus()
+    currentWord == ""
     removeElements()
 }
 
 function removeElements() {
     let items = inputElement.querySelectorAll(".lists-uniqe")
     items?.forEach(e => e.remove())
+    let parentDiv = inputElement.querySelector(".parent-div");
+    parentDiv?.insertAdjacentElement("afterend",parentDiv.firstChild);
+    inputElement.querySelector(".parent-div")?.remove();
     // inputElement.querySelector(".lists-uniqe")?.parentElement?.remove()
 }
