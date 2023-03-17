@@ -106,6 +106,7 @@ function displaySuggesation(value) {
     ele2[0].value = wordsarray.join(" ") 
     ele2[0].textContent = wordsarray.join(" ") 
     ele2[0].focus()
+    ele2[0].dispatchEvent(new window.Event('change', { bubbles: true }))
     str = wordsarray.join(" ")  
     removeElements()
 }
