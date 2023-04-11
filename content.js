@@ -6,7 +6,10 @@ let lastWord;
 let lastWordIndex
 
 inputElement.addEventListener("input", async function (e) { 
-    let searchString = e.target?.value?.trim()?.split(" ");
+    let string1 = e.target?.value?.trim()?.split(" ");
+    let string2 = e.target?.innerHTML?.trim()?.split(" ");
+    let searchString = string1
+    console.log("searchString", searchString)
     if (!str?.length) {
         // running first time when the user start type to get the first letter
         lastWord = searchString?.[searchString?.length - 1];
@@ -45,7 +48,7 @@ inputElement.addEventListener("input", async function (e) {
     const { data } = await chrome?.storage?.local?.get(['data'])
     const words = data?.data
     let matched = words?.filter(ele => {
-        if (lastWord.length > 2) {
+        if (lastWord?.length > 2) {
 
             return ele.toLowerCase().startsWith(lastWord?.trim()?.toLowerCase())
         } else {
@@ -64,6 +67,7 @@ inputElement.addEventListener("input", async function (e) {
 
     // we want to add a li under ul for appending the word in the respective input feild
     var newEle = inputElement.getElementsByClassName("auto-suggest") 
+    console.log("newEle", newEle)
    let ulList = document.createElement("ul")
     ulList.classList.add("list1")
     ulList.id = "suggestion"
