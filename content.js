@@ -1,4 +1,3 @@
-
 let inputElement = document.activeElement;
 
 let str = ""
@@ -6,27 +5,26 @@ let lastWord;
 let lastWordIndex
 var x
 var y
-var searchString 
 
 inputElement.addEventListener("click", () => {
     removeElements()
 })
 
 inputElement.addEventListener("input", async function (e) {
-    if (e.target.type != 'email' && e.target.type != "password"){
-        // let searchString
-        if((e.target.nodeName == 'TEXTAREA' || e.target.nodeName == 'INPUT')) {
-            let position = getCaretPosition(e.target); 
+    if (e.target.type != 'email' && e.target.type != "password") {
+        let searchString
+        if ((e.target.nodeName == 'TEXTAREA' || e.target.nodeName == 'INPUT')) {
+            let position = getCaretPosition(e.target);
             x = position.x
             y = position.y
-            searchString = e.target?.value?.trim()?.split(" ");
+            searchString = e.target?.value?.split(" ");
         } else {
             let position = getCaretCoordinates()
             x = position.x
             y = position.y
-            searchString = e.target?.innerHTML?.trim()?.split(" ");
+            searchString = e.target?.innerText?.split(" ");
         }
-        
+
         if (!str?.length) {
             // running first time when the user start type to get the first letter
             lastWord = searchString?.[searchString?.length - 1];
@@ -39,7 +37,7 @@ inputElement.addEventListener("input", async function (e) {
             // Here we are getting the typing word from the user
             let currentWord = ""
             for (let i = 0; i < strarray?.length; i++) {
-                if (strarray[i] != searchString[i]) {
+                if (strarray[i]?.trim() != searchString[i]?.trim()) {
                     currentWord = searchString[i]
                     lastWordIndex = i + 1;
                     break;
@@ -59,16 +57,20 @@ inputElement.addEventListener("input", async function (e) {
             }
         }
 
-        str = e.target?.value
+        if ((e.target.nodeName == 'TEXTAREA' || e.target.nodeName == 'INPUT')) {
+            str = e.target?.value
+        } else {
+            str = e.target?.innerText
+        }
 
         // we have got the last typed word from user. Now we will match the word from the database.
         const { data } = await chrome?.storage?.local?.get(['data'])
         const words = data?.data
         let matched = words?.filter(ele => {
             if (lastWord?.length > 2) {
-
                 return ele.toLowerCase().startsWith(lastWord?.trim()?.toLowerCase())
             } else {
+                lastWord = ""
                 return false
             }
         })
@@ -88,7 +90,7 @@ inputElement.addEventListener("input", async function (e) {
         ulList.classList.add("list1")
         ulList.id = "suggestion"
         ulList.style.listStyle = "none"
-        ulList.style.position = `${(e.target.nodeName == 'TEXTAREA' || e.target.nodeName == 'INPUT')?'absolute':'fixed'}`
+        ulList.style.position = `${(e.target.nodeName == 'TEXTAREA' || e.target.nodeName == 'INPUT') ? 'absolute' : 'fixed'}`
         ulList.style.backgroundColor = '#fff'
         ulList.style.zIndex = '999999'
         ulList.style.top = (y) + "px"
@@ -123,13 +125,20 @@ function displaySuggesation(value) {
     let data = value.target.textContent
     let ele2 = inputElement.getElementsByClassName("auto-suggest")
     // let wordArr = ele2[0]?.value != undefined ? ele2[0]?.value?.split(" ")  : searchString
-    let wordsarray =  ele2[0]?.value?.split(" ")
+    let wordsarray = ele2[0]?.value != undefined ? ele2[0]?.value?.split(" ") : ele2[0]?.innerText?.split(" ");
     if (!data) return
-    wordsarray[lastWordIndex - 1] = data + " "
-    ele2[0].value = wordsarray?.join(" ")
-    ele2[0].textContent = wordsarray?.join(" ")
-    ele2[0].focus()
-    ele2[0].dispatchEvent(new window.Event('change', { bubbles: true }))
+    if (ele2[0]?.value == undefined) {
+        wordsarray[lastWordIndex - 1] = data + " "
+        ele2[0].innerText = wordsarray?.join(" ")
+        ele2[0].focus()
+        ele2[0].dispatchEvent(new window.Event('input', { bubbles: true }))
+    } else {
+        wordsarray[lastWordIndex - 1] = data + " "
+        ele2[0].value = wordsarray?.join(" ")
+        ele2[0].textContent = wordsarray?.join(" ")
+        ele2[0].focus()
+        ele2[0].dispatchEvent(new window.Event('change', { bubbles: true }))
+    }
     str = wordsarray?.join(" ")
     removeElements()
 }
@@ -199,21 +208,20 @@ function getCaretPosition(textArea) {
 // ----------------------Start----------------------------
 function getCaretCoordinates() {
     let x = 0,
-      y = 0;
+        y = 0;
     const isSupported = typeof window.getSelection !== "undefined";
     if (isSupported) {
-      const selection = window.getSelection();
-      if (selection.rangeCount !== 0) {
-        const range = selection.getRangeAt(0).cloneRange();
-        range.collapse(true);
-        const rect = range.getClientRects()[0];
-        if (rect) {
-          x = rect.left; 
-          y = rect.top; 
+        const selection = window.getSelection();
+        if (selection.rangeCount !== 0) {
+            const range = selection.getRangeAt(0).cloneRange();
+            range.collapse(true);
+            const rect = range.getClientRects()[0];
+            if (rect) {
+                x = rect.left;
+                y = rect.top;
+            }
         }
-      }
     }
     return { x, y };
-  }
-  // ---------------------- end ----------------------------
-
+}
+  // ---------------------- end ---------------------------
