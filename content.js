@@ -13,7 +13,8 @@ inputElement.addEventListener("click", () => {
 inputElement.addEventListener("input", async function (e) {
     if (e.target.type != 'email' && e.target.type != "password") {
         let searchString
-        if ((e.target.nodeName == 'TEXTAREA' || e.target.nodeName == 'INPUT')) {
+        let editableFeild = (e.target.nodeName == 'TEXTAREA' || e.target.nodeName == 'INPUT') ? true : false
+        if (editableFeild) {
             let position = getCaretPosition(e.target);
             x = position.x
             y = position.y
@@ -57,7 +58,7 @@ inputElement.addEventListener("input", async function (e) {
             }
         }
 
-        if ((e.target.nodeName == 'TEXTAREA' || e.target.nodeName == 'INPUT')) {
+        if (editableFeild) {
             str = e.target?.value
         } else {
             str = e.target?.innerText
@@ -90,10 +91,10 @@ inputElement.addEventListener("input", async function (e) {
         ulList.classList.add("list1")
         ulList.id = "suggestion"
         ulList.style.listStyle = "none"
-        ulList.style.position = `${(e.target.nodeName == 'TEXTAREA' || e.target.nodeName == 'INPUT') ? 'absolute' : 'fixed'}`
+        ulList.style.position = `${editableFeild ? 'absolute' : 'fixed'}`
         ulList.style.backgroundColor = '#fff'
         ulList.style.zIndex = '999999'
-        ulList.style.top = (y) + "px"
+        ulList.style.top = editableFeild ? (y + 30) + "px" : (y) + "px" 
         ulList.style.left = x + "px"
         ulList.style.padding = "0px 16px"
         ulList.style.boxShadow = "rgba(0, 0, 0, 0.07) 0px 1px 2px, rgba(0, 0, 0, 0.07) 0px 2px 4px, rgba(0, 0, 0, 0.07) 0px 4px 8px, rgba(0, 0, 0, 0.07) 0px 8px 16px, rgba(0, 0, 0, 0.07) 0px 16px 32px, rgba(0, 0, 0, 0.07) 0px 32px 64px"
@@ -123,21 +124,20 @@ inputElement.addEventListener("input", async function (e) {
 
 function displaySuggesation(value) {
     let data = value.target.textContent
-    let ele2 = inputElement.getElementsByClassName("auto-suggest")
-    // let wordArr = ele2[0]?.value != undefined ? ele2[0]?.value?.split(" ")  : searchString
-    let wordsarray = ele2[0]?.value != undefined ? ele2[0]?.value?.split(" ") : ele2[0]?.innerText?.split(" ");
+    let element = inputElement.getElementsByClassName("auto-suggest")
+    let wordsarray = element[0]?.value != undefined ? element[0]?.value?.split(" ") : element[0]?.innerText?.split(" ");
     if (!data) return
-    if (ele2[0]?.value == undefined) {
+    if (element[0]?.value == undefined) {
         wordsarray[lastWordIndex - 1] = data + " "
-        ele2[0].innerText = wordsarray?.join(" ")
-        ele2[0].focus()
-        ele2[0].dispatchEvent(new window.Event('input', { bubbles: true }))
+        element[0].innerText = wordsarray?.join(" ")
+        element[0].focus()
+        element[0].dispatchEvent(new window.Event('input', { bubbles: true }))
     } else {
         wordsarray[lastWordIndex - 1] = data + " "
-        ele2[0].value = wordsarray?.join(" ")
-        ele2[0].textContent = wordsarray?.join(" ")
-        ele2[0].focus()
-        ele2[0].dispatchEvent(new window.Event('change', { bubbles: true }))
+        element[0].value = wordsarray?.join(" ")
+        element[0].textContent = wordsarray?.join(" ")
+        element[0].focus()
+        element[0].dispatchEvent(new window.Event('change', { bubbles: true }))
     }
     str = wordsarray?.join(" ")
     removeElements()

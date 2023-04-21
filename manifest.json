@@ -1,11 +1,9 @@
 {
     "name": "Medspell Auto Suggest",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "manifest_version": 3,
-    "description": "An extension that auto-corrects the user's spelling as they type",
+    "description": "An extension that auto-suggest the medical's spellings when they type in",
     "permissions": [
-      "tabs",
-      "activeTab",
       "storage"
     ],
     "icons": {
