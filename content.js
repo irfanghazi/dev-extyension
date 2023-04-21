@@ -5,10 +5,61 @@ let lastWord;
 let lastWordIndex
 var x
 var y
-
+var caretIndex
 inputElement.addEventListener("click", () => {
     removeElements()
 })
+function doGetCaretPosition (oField) {
+
+    // Initialize
+    var iCaretPos = 0;
+  
+    // IE Support
+    if (document.selection) {
+  
+      // Set focus on the element
+      oField.focus();
+  
+      // To get cursor position, get empty selection range
+      var oSel = document.selection.createRange();
+  
+      // Move selection start to 0 position
+      oSel.moveStart('character', -oField.value.length);
+  
+      // The caret position is selection length
+      iCaretPos = oSel.text.length;
+    }
+  
+    // Firefox support
+    else if (oField.selectionStart || oField.selectionStart == '0')
+      iCaretPos = oField.selectionDirection=='backward' ? oField.selectionStart : oField.selectionEnd;
+  
+    // Return results
+    return iCaretPos;
+  }
+  function getCaretIndex(element) {
+    let position = 0;
+    const isSupported = typeof window.getSelection !== "undefined";
+    if (isSupported) {
+      const selection = window.getSelection();
+      // Check if there is a selection (i.e. cursor in place)
+      if (selection.rangeCount !== 0) {
+        // Store the original range
+        const range = window.getSelection().getRangeAt(0);
+        // Clone the range
+        const preCaretRange = range.cloneRange();
+        // Select all textual contents from the contenteditable element
+        preCaretRange.selectNodeContents(element);
+        // And set the range end to the original clicked position
+        preCaretRange.setEnd(range.endContainer, range.endOffset);
+        // Return the text length from contenteditable start to the range end
+        position = preCaretRange.toString().length;
+      }
+    }
+    return position;
+  }
+  
+
 
 inputElement.addEventListener("input", async function (e) {
     if (e.target.type != 'email' && e.target.type != "password") {
@@ -19,11 +70,13 @@ inputElement.addEventListener("input", async function (e) {
             x = position.x
             y = position.y
             searchString = e.target?.value?.split(" ");
+            caretIndex = doGetCaretPosition(e.target)
         } else {
             let position = getCaretCoordinates()
             x = position.x
             y = position.y
             searchString = e.target?.innerText?.split(" ");
+            caretIndex = getCaretIndex(e.target)
         }
 
         if (!str?.length) {
@@ -111,7 +164,7 @@ inputElement.addEventListener("input", async function (e) {
             let listItem = document.createElement("li")
             listItem.classList.add("lists-uniqe")
             listItem.style.cursor = "pointer";
-            listItem.innerHTML = i
+            listItem.innerHTML = i;
             listItem.onclick = displaySuggesation
             document.querySelector(".list1")?.appendChild(listItem)
         }
@@ -125,22 +178,74 @@ inputElement.addEventListener("input", async function (e) {
 function displaySuggesation(value) {
     let data = value.target.textContent
     let element = inputElement.getElementsByClassName("auto-suggest")
-    let wordsarray = element[0]?.value != undefined ? element[0]?.value?.split(" ") : element[0]?.innerText?.split(" ");
+    let wordsarray = element[0]?.value != undefined ? element[0]?.value?.split(" ") : element[0]?.innerHTML?.split(" ");
+    var lastwordlength = wordsarray[lastWordIndex -1].length
+    
     if (!data) return
+    var displayCaret
     if (element[0]?.value == undefined) {
-        wordsarray[lastWordIndex - 1] = data + " "
-        element[0].innerText = wordsarray?.join(" ")
-        element[0].focus()
+        if(wordsarray?.length == lastWordIndex) {
+            wordsarray[lastWordIndex - 1] = data + "&nbsp" ;
+            displayCaret = caretIndex - lastwordlength + data.length + 1
+        } else {
+            wordsarray[lastWordIndex - 1] = data;
+            displayCaret = caretIndex - lastwordlength + data.length
+        }
+        element[0].innerHTML = wordsarray?.join(" ")
+        caretPositionContentEditable(element[0],displayCaret)
         element[0].dispatchEvent(new window.Event('input', { bubbles: true }))
     } else {
-        wordsarray[lastWordIndex - 1] = data + " "
+
+        if(wordsarray?.length == lastWordIndex) {
+            wordsarray[lastWordIndex - 1] = data + " " ;
+            displayCaret = caretIndex - lastwordlength + data.length + 1
+            // displayCaret = caretIndex - wordsarray[lastWordIndex - 1].length + data.length + 1
+        } else {
+            wordsarray[lastWordIndex - 1] = data;
+            displayCaret = caretIndex - lastwordlength + data.length
+        }
         element[0].value = wordsarray?.join(" ")
         element[0].textContent = wordsarray?.join(" ")
-        element[0].focus()
+        // element[0].focus()
+        console.log(displayCaret)
+        setCaretPosition(element[0],displayCaret)
         element[0].dispatchEvent(new window.Event('change', { bubbles: true }))
     }
     str = wordsarray?.join(" ")
     removeElements()
+}
+
+function setCaretPosition(elem, caretPos) {
+    // var elem = document.getElementById(elemId);
+
+    if(elem != null) {
+        if(elem.createTextRange) {
+            var range = elem.createTextRange();
+            range.move('character', caretPos);
+            range.select();
+        }
+        else {
+            if(elem.selectionStart) {
+                elem.focus();
+                elem.setSelectionRange(caretPos, caretPos);
+            }
+            else
+                elem.focus();
+        }
+    }
+}
+
+function caretPositionContentEditable(element,position) {
+element.focus();
+var textNode = element.firstChild;
+var caret = position; // insert caret after the 10th character say
+var range = document.createRange();
+range.setStart(textNode, caret);
+range.setEnd(textNode, caret);
+var sel = window.getSelection();
+sel.removeAllRanges();
+sel.addRange(range);
+
 }
 
 function removeElements() {
@@ -179,7 +284,6 @@ function createCopy(textArea) {
     document.body.appendChild(copy);
     return copy;
 }
-
 
 function getCaretPosition(textArea) {
     var start = textArea.selectionStart;
